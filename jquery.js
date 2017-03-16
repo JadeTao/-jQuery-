@@ -143,22 +143,22 @@ jQuery.fn = jQuery.prototype = {
 		return num < 0 ? this[ num + this.length ] : this[ num ];  //此处类似String.prototype.substr
 	},
 
-	// Take an array of elements and push it onto the stack
+	// Take an array of elements and push it onto the stack  入栈
 	// (returning the new matched element set)
-	pushStack: function( elems ) {                               ////////////////////////////这个api有点陌生，回头再看。
+	pushStack: function( elems ) {                               //取一个数组中的元素，将其放入堆上，返回新的堆上的元素集合（jQuery对象）
 
 		// Build a new jQuery matched element set
-		var ret = jQuery.merge( this.constructor(), elems );
-
+		var ret = jQuery.merge( this.constructor(), elems ); //jQuery.merge(first,last)   将两个数组内容合并 ，first是被merge的，last数组不会被改变
+															 //this.constructor()是个空的JQ对象
 		// Add the old object onto the stack (as a reference)
-		ret.prevObject = this;
+		ret.prevObject = this;  // 将this挂到该属性下，就可通过end()找到
 
 		// Return the newly-formed element set
 		return ret;
 	},
 
 	// Execute a callback for every element in the matched set.
-	//第
+	
 	each: function( callback ) {
 		return jQuery.each( this, callback );
 	},
@@ -183,7 +183,7 @@ jQuery.fn = jQuery.prototype = {
 
 	eq: function( i ) {
 		var len = this.length,
-			j = +i + ( i < 0 ? len : 0 );
+			j = +i + ( i < 0 ? len : 0 );  // +i ,把字符串转为数组，i为负数则查询i+length的内容
 		return this.pushStack( j >= 0 && j < len ? [ this[ j ] ] : [] );
 	},
 
@@ -198,29 +198,29 @@ jQuery.fn = jQuery.prototype = {
 	splice: arr.splice
 };
 
-jQuery.extend = jQuery.fn.extend = function() {
+jQuery.extend = jQuery.fn.extend = function() {   //注意 jQuery.fn = jQuery.prototype
 	var options, name, src, copy, copyIsArray, clone,
 		target = arguments[ 0 ] || {},
 		i = 1,
 		length = arguments.length,
 		deep = false;
 
-	// Handle a deep copy situation
+	// Handle a deep copy situation     //当第一个参数是布尔值的时候，会被来判断是否开启深复制，并从第二个参数开始读取；如果不是布尔值，默认开启浅复制
 	if ( typeof target === "boolean" ) {
 		deep = target;
 
 		// Skip the boolean and the target
-		target = arguments[ i ] || {};
+		target = arguments[ i ] || {};  //无参数时，给target一个空对象
 		i++;
 	}
 
 	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {
-		target = {};
+	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {  //为什么要做类型判断？
+		target = {}; 
 	}
 
 	// Extend jQuery itself if only one argument is passed
-	if ( i === length ) {
+	if ( i === length ) {                 //只接受一个参数时，用参数来扩展jQuery本身
 		target = this;
 		i--;
 	}
@@ -241,7 +241,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 				}
 
 				// Recurse if we're merging plain objects or arrays
-				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||
+				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||              //jQuery.isPlainObject 判断是否是纯粹对象
 					( copyIsArray = jQuery.isArray( copy ) ) ) ) {
 
 					if ( copyIsArray ) {
