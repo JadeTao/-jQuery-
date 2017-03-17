@@ -15,7 +15,7 @@
 // IIFE+闭包管理命名空间(namespace)，防止变量污染全局作用域
 	"use strict";
 
-	if ( typeof module === "object" && typeof module.exports === "object" ) {
+	if ( typeof module === "object" && typeof module.exports === "object" ) {     // ||，&&可以用来进行类似if的条件判断，a||b||c 返回第一个为真的值，无真值则返回最后一个值，a&&b&&c返回第一个为假的值，无假值则返回最后一个值
 
 		// For CommonJS and CommonJS-like environments where a proper `window`
 		// is present, execute the factory and get jQuery.
@@ -68,7 +68,7 @@ var hasOwn = class2type.hasOwnProperty;
 
 var fnToString = hasOwn.toString;
 
-var ObjectFunctionString = fnToString.call( Object ); //typeof ObjectFunctionString     "function Object() { [native code] }"
+var ObjectFunctionString = fnToString.call( Object ); //typeof ObjectFunctionString   =  "function Object() { [native code] }"
 
 var support = {};
 
@@ -102,6 +102,7 @@ var
 
 	// Support: Android <=4.0 only
 	// Make sure we trim BOM and NBSP
+
 	//字节序标记 (\uFEFF) 即nbsp 空白字符
 	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,  
 
@@ -210,17 +211,17 @@ jQuery.extend = jQuery.fn.extend = function() {   //注意 jQuery.fn = jQuery.pr
 		deep = target;
 
 		// Skip the boolean and the target
-		target = arguments[ i ] || {};  //无参数时，给target一个空对象
+		target = arguments[ i ] || {};  //接受>=1个参数且第一个参数为布尔值时，布尔值被赋给deep，并将target顺延获取第二个参数，无第二个参数时，给target一个空对象
 		i++;
 	}
 
 	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {  //为什么要做类型判断？
+	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {  //如果target不为对象或函数，则不进行拷贝，将target赋值空对象
 		target = {}; 
 	}
 
 	// Extend jQuery itself if only one argument is passed
-	if ( i === length ) {                 //只接受一个参数时，用参数来扩展jQuery本身
+	if ( i === length ) {                 //不计布尔值，只接受一个参数对象时，用参数来扩展jQuery本身
 		target = this;
 		i--;
 	}
@@ -231,7 +232,7 @@ jQuery.extend = jQuery.fn.extend = function() {   //注意 jQuery.fn = jQuery.pr
 		if ( ( options = arguments[ i ] ) != null ) {
 
 			// Extend the base object
-			for ( name in options ) {
+			for ( name in options ) {  // 无序遍历options对象中的属性 , target是被扩展对象，src是扩展来源对象中的属性，copy是src的副本
 				src = target[ name ];
 				copy = options[ name ];
 
@@ -241,22 +242,22 @@ jQuery.extend = jQuery.fn.extend = function() {   //注意 jQuery.fn = jQuery.pr
 				}
 
 				// Recurse if we're merging plain objects or arrays
-				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||              //jQuery.isPlainObject 判断是否是纯粹对象
-					( copyIsArray = jQuery.isArray( copy ) ) ) ) {
+				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||        //深复制入口，jQuery.isPlainObject 判断是否为纯粹对象(字面量或new Object生成的对象)，															 
+					( copyIsArray = jQuery.isArray( copy ) ) ) ) {			  //否，则判断是否为数组
 
-					if ( copyIsArray ) {
+					if ( copyIsArray ) {									  //数组处理
 						copyIsArray = false;
 						clone = src && jQuery.isArray( src ) ? src : [];
 
-					} else {
+					} else {												
 						clone = src && jQuery.isPlainObject( src ) ? src : {};
 					}
 
 					// Never move original objects, clone them
-					target[ name ] = jQuery.extend( deep, clone, copy );
+					target[ name ] = jQuery.extend( deep, clone, copy );	//这个方法哪来的？
 
 				// Don't bring in undefined values
-				} else if ( copy !== undefined ) {
+				} else if ( copy !== undefined ) {							//浅复制入口，或者说，当属性不为纯粹对象时，深复制的处理方法跟浅复制相同
 					target[ name ] = copy;
 				}
 			}
@@ -267,7 +268,7 @@ jQuery.extend = jQuery.fn.extend = function() {   //注意 jQuery.fn = jQuery.pr
 	return target;
 };
 
-jQuery.extend( {
+jQuery.extend( {															//通过上面定义的extend方法为jQuery添加各种方法
 
 	// Unique for each copy of jQuery on the page
 	expando: "jQuery" + ( version + Math.random() ).replace( /\D/g, "" ),
@@ -287,17 +288,17 @@ jQuery.extend( {
 
 	isArray: Array.isArray,
 
-	isWindow: function( obj ) {
+	isWindow: function( obj ) {								//为什么要检测null？
 		return obj != null && obj === obj.window;
 	},
 
-	isNumeric: function( obj ) {
+	isNumeric: function( obj ) {							//判断参数是否为数字或只包含纯数字的字符串
 
 		// As of jQuery 3.0, isNumeric is limited to
 		// strings and numbers (primitives or objects)
 		// that can be coerced to finite numbers (gh-2662)
-		var type = jQuery.type( obj );
-		return ( type === "number" || type === "string" ) &&
+		var type = jQuery.type( obj );												
+		return ( type === "number" || type === "string" ) &&                     //这个手法很妙，利用parseFloat('1111word') =1111 的特性
 
 			// parseFloat NaNs numeric-cast false positives ("")
 			// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
@@ -310,20 +311,20 @@ jQuery.extend( {
 
 		// Detect obvious negatives
 		// Use toString instead of jQuery.type to catch host objects
-		if ( !obj || toString.call( obj ) !== "[object Object]" ) {
+		if ( !obj || toString.call( obj ) !== "[object Object]" ) {        //Object.prototype.string.call() 深度检测对象类型
 			return false;
 		}
 
-		proto = getProto( obj );
+		proto = getProto( obj );											//Object.getPrototypeOf
 
 		// Objects with no prototype (e.g., `Object.create( null )`) are plain
 		if ( !proto ) {
 			return true;
 		}
 
-		// Objects with prototype are plain iff they were constructed by a global Object function
-		Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;
-		return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;
+		// Objects with prototype are plain if they were constructed by a global Object function
+		Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;                         //判断是否为 new Object()创建
+		return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;   //上文 ：var ObjectFunctionString = fnToString.call( Object ); //typeof ObjectFunctionString   =  "function Object() { [native code] }"
 	},
 
 	isEmptyObject: function( obj ) {
@@ -332,7 +333,7 @@ jQuery.extend( {
 		// See https://github.com/eslint/eslint/issues/6125
 		var name;
 
-		for ( name in obj ) {
+		for ( name in obj ) {          //in操作符
 			return false;
 		}
 		return true;
@@ -344,12 +345,13 @@ jQuery.extend( {
 		}
 
 		// Support: Android <=2.3 only (functionish RegExp)
-		return typeof obj === "object" || typeof obj === "function" ?
-			class2type[ toString.call( obj ) ] || "object" :
+		return typeof obj === "object" || typeof obj === "function" ?				//var class2type = {}; var toString = class2type.toString;
+
+			class2type[ toString.call( obj ) ] || "object" :					//class2type[ toString.call( obj ) ] 的作用是什么？
 			typeof obj;
 	},
 
-	// Evaluates a script in a global context
+	// Evaluates a script in a global context                           //全局环境下执行一段代码（通过插入script标签）
 	globalEval: function( code ) {
 		DOMEval( code );
 	},
@@ -358,9 +360,9 @@ jQuery.extend( {
 	// Support: IE <=9 - 11, Edge 12 - 13
 	// Microsoft forgot to hump their vendor prefix (#9572)
 	camelCase: function( string ) {
-		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
-	},
-
+		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );   //	rmsPrefix = /^-ms-/, 	rdashAlpha = /-([a-z])/g,
+	},																					//正则rdashAlpha用于匹配字符串中连字符“-”和其后的第一个字母
+																						//匹配部分会被替换为对应的大写字母
 	nodeName: function( elem, name ) {
 		return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 	},
@@ -390,15 +392,15 @@ jQuery.extend( {
 	trim: function( text ) {
 		return text == null ?
 			"" :
-			( text + "" ).replace( rtrim, "" );
+			( text + "" ).replace( rtrim, "" );   //rtrim 正则匹配空白字符
 	},
 
 	// results is for internal usage only
-	makeArray: function( arr, results ) {
+	makeArray: function( arr, results ) {        // 转换一个类似数组的对象成为真正的JavaScript数组。
 		var ret = results || [];
 
 		if ( arr != null ) {
-			if ( isArrayLike( Object( arr ) ) ) {
+			if ( isArrayLike( Object( arr ) ) ) {   // Object( arr )生成一个对象，但这是什么用法
 				jQuery.merge( ret,
 					typeof arr === "string" ?
 					[ arr ] : arr
@@ -417,7 +419,7 @@ jQuery.extend( {
 
 	// Support: Android <=4.0 only, PhantomJS 1 only
 	// push.apply(_, arraylike) throws on ancient WebKit
-	merge: function( first, second ) {
+	merge: function( first, second ) {            	//这个函数多次被其他函数内部调用，用来合并两个数组或类数组
 		var len = +second.length,
 			j = 0,
 			i = first.length;
@@ -431,12 +433,12 @@ jQuery.extend( {
 		return first;
 	},
 
-	grep: function( elems, callback, invert ) {
+	grep: function( elems, callback, invert ) {		//invert是布尔值，false则函数返回callback返回值为true的函数，true则相反，invert默认值为false
 		var callbackInverse,
 			matches = [],
 			i = 0,
 			length = elems.length,
-			callbackExpect = !invert;
+			callbackExpect = !invert; 				//如果invert不填，则为undefined，!undefinded===true
 
 		// Go through the array, only saving the items
 		// that pass the validator function
