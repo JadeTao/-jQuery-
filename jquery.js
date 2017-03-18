@@ -420,7 +420,7 @@ jQuery.extend( {															//通过上面定义的extend方法为jQuery添�
 	// Support: Android <=4.0 only, PhantomJS 1 only
 	// push.apply(_, arraylike) throws on ancient WebKit
 	merge: function( first, second ) {            	//这个函数多次被其他函数内部调用，用来合并两个数组或类数组
-		var len = +second.length,
+		var len = +second.length,					//关于“+”：解释一：asm.js写法，是js的子集，用于提升性能，解释二：arraylike 的length可能不为数字
 			j = 0,
 			i = first.length;
 
@@ -459,7 +459,7 @@ jQuery.extend( {															//通过上面定义的extend方法为jQuery添�
 			ret = [];
 
 		// Go through the array, translating each of the items to their new values
-		if ( isArrayLike( elems ) ) {
+		if ( isArrayLike( elems ) ) {							//遍历数组用for循环，遍历对象用for in，for in是无序遍历，而对数组而言，顺序比较重要
 			length = elems.length;
 			for ( ; i < length; i++ ) {
 				value = callback( elems[ i ], i, arg );
@@ -489,10 +489,10 @@ jQuery.extend( {															//通过上面定义的extend方法为jQuery添�
 
 	// Bind a function to a context, optionally partially applying any
 	// arguments.
-	proxy: function( fn, context ) {
-		var tmp, args, proxy;
+	proxy: function( fn, context ) {									//proxy用法：1：jQuery.proxy( function, context [, additionalArguments ] )将函数function的上下文对象更改为指定的context。
+		var tmp, args, proxy;											//			 2：jQuery.proxy( context, name [, additionalArguments ] )将名为name的函数的上下文更改为指定的context。函数name应是context对象的一个属性。
 
-		if ( typeof context === "string" ) {
+		if ( typeof context === "string" ) {							//第二种用法的判定
 			tmp = fn[ context ];
 			context = fn;
 			fn = tmp;
@@ -505,13 +505,13 @@ jQuery.extend( {															//通过上面定义的extend方法为jQuery添�
 		}
 
 		// Simulated bind
-		args = slice.call( arguments, 2 );
+		args = slice.call( arguments, 2 );            //处理参数[, additionalArguments ]
 		proxy = function() {
 			return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
 		};
 
 		// Set the guid of unique handler to the same of original handler, so it can be removed
-		proxy.guid = fn.guid = fn.guid || jQuery.guid++;
+		proxy.guid = fn.guid = fn.guid || jQuery.guid++;		//为将来移除proxy提供guid句柄
 
 		return proxy;
 	},
@@ -520,11 +520,11 @@ jQuery.extend( {															//通过上面定义的extend方法为jQuery添�
 
 	// jQuery.support is not used in Core but other projects attach their
 	// properties to it so it needs to exist.
-	support: support
+	support: support 			//一个空对象，用于以后储存其他属性
 } );
 
-if ( typeof Symbol === "function" ) {
-	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];
+if ( typeof Symbol === "function" ) {							//不是很懂这个条件判定  添加了一个迭代器，fn实际上是一个对象。要想能够被for...of正常遍历的，都需要实现一个遍历器Iterator。而数组，Set和Map结构，早就内置好了遍历器Iterator（又叫迭代器），它们的原型中都有一个Symbol.iterator方法；而Object对象并没有实现这个接口，使得它无法被for...of遍历。
+	jQuery.fn[ Symbol.iterator ] = arr[ Symbol.iterator ];		// 把arr数组的迭代器赋给jQuery.fn，使fn可以被for of迭代
 }
 
 // Populate the class2type map
@@ -532,24 +532,34 @@ jQuery.each( "Boolean Number String Function Array Date RegExp Object Error Symb
 function( i, name ) {
 	class2type[ "[object " + name + "]" ] = name.toLowerCase();
 } );
-
+//得到：
+//class2type[[object Boolean]] = "boolean"  
+//class2type[[object Number]] = "number"  
+//class2type[[object String]] = "string"  
+//class2type[[object Funtion]] = "funtion"  
+//class2type[[object Array]] = "array"  
+//class2type[[object Date]] = "date"  
+//class2type[[object RegExp]] = "regexp"  
+//class2type[[object Object]] = "object"  
+//class2type[[object Error]] = "error"  
+//才是是用来为Object.prototype.toString.call()判断类型服务
 function isArrayLike( obj ) {
 
 	// Support: real iOS 8.2 only (not reproducible in simulator)
 	// `in` check used to prevent JIT error (gh-2145)
 	// hasOwn isn't used here due to false negatives
 	// regarding Nodelist length in IE
-	var length = !!obj && "length" in obj && obj.length,
+	var length = !!obj && "length" in obj && obj.length,  //!!obj？ 如果obj里面有length键，则length等于obj.lenght;否则等于false
 		type = jQuery.type( obj );
 
-	if ( type === "function" || jQuery.isWindow( obj ) ) {
+	if ( type === "function" || jQuery.isWindow( obj ) ) {//如果obj是function类型 或者是window对象 则返回false;
 		return false;
 	}
 
 	return type === "array" || length === 0 ||
-		typeof length === "number" && length > 0 && ( length - 1 ) in obj;
+		typeof length === "number" && length > 0 && ( length - 1 ) in obj; //多组条件判断 一个条件满足即为数组  ( length - 1 ) in obj，边界判断
 }
-var Sizzle =
+var Sizzle =				//越过sizzle
 /*!
  * Sizzle CSS Selector Engine v2.3.3
  * https://sizzlejs.com/
@@ -2804,7 +2814,7 @@ return Sizzle;
 
 })( window );
 
-
+////////////////////sizzle结束
 
 jQuery.find = Sizzle;
 jQuery.expr = Sizzle.selectors;
