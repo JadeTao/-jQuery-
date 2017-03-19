@@ -146,7 +146,7 @@ jQuery.fn = jQuery.prototype = {
 
 	// Take an array of elements and push it onto the stack  入栈
 	// (returning the new matched element set)
-	pushStack: function( elems ) {                               //取一个数组中的元素，将其放入堆上，返回新的堆上的元素集合（jQuery对象）
+	pushStack: function( elems ) {                               //取一个数组中的元素，将其放入栈上，返回新的栈上的元素集合（jQuery对象）
 
 		// Build a new jQuery matched element set
 		var ret = jQuery.merge( this.constructor(), elems ); //jQuery.merge(first,last)   将两个数组内容合并 ，first是被merge的，last数组不会被改变
