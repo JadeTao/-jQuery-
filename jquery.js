@@ -419,9 +419,9 @@ jQuery.extend( {															//通过上面定义的extend方法为jQuery添�
 
 	// Support: Android <=4.0 only, PhantomJS 1 only
 	// push.apply(_, arraylike) throws on ancient WebKit
-	merge: function( first, second ) {            	//这个函数多次被其他函数内部调用，用来合并两个数组或类数组
-		var len = +second.length,					//关于“+”：解释一：asm.js写法，是js的子集，用于提升性能，解释二：arraylike 的length可能不为数字
-			j = 0,
+	merge: function( first, second ) {            	//这个函数多次被其他函数内部调用，用来合并两个数组或类数组(要有数字类型的length或者可以转化为数字类型的length)
+		var len = +second.length,					//关于“+”：arraylike 的length可能不为数字
+			j = 0,									//merge是破坏性的，第一个数组的内容被改变
 			i = first.length;
 
 		for ( ; j < len; j++ ) {
@@ -2830,16 +2830,16 @@ jQuery.escapeSelector = Sizzle.escape;
 
 
 
-var dir = function( elem, dir, until ) {
+var dir = function( elem, dir, until ) {                          //从一个元素出发，迭代检索某个方向上的所有元素并记录，直到与遇到document对象或遇到until匹配的元素
 	var matched = [],
 		truncate = until !== undefined;
 
-	while ( ( elem = elem[ dir ] ) && elem.nodeType !== 9 ) {
-		if ( elem.nodeType === 1 ) {
+	while ( ( elem = elem[ dir ] ) && elem.nodeType !== 9 ) {  //nodeType9     Document	代表整个文档（DOM 树的根节点）。
+		if ( elem.nodeType === 1 ) {						   //nodeType 1     Element	代表元素
 			if ( truncate && jQuery( elem ).is( until ) ) {
-				break;
+				break;//遇到undefined或者目标结点，跳出while循环
 			}
-			matched.push( elem );
+			matched.push( elem );//符合条件，将Element  push进matched数组
 		}
 	}
 	return matched;
@@ -2849,7 +2849,7 @@ var dir = function( elem, dir, until ) {
 var siblings = function( n, elem ) {
 	var matched = [];
 
-	for ( ; n; n = n.nextSibling ) {
+	for ( ; n; n = n.nextSibling ) {		//将复杂的条件判断放到if里，如果没有下一个兄弟结点，跳出for循环
 		if ( n.nodeType === 1 && n !== elem ) {
 			matched.push( n );
 		}
@@ -2868,15 +2868,15 @@ var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|
 var risSimple = /^.[^:#\[\.,]*$/;
 
 // Implement the identical functionality for filter and not
-function winnow( elements, qualifier, not ) {
-	if ( jQuery.isFunction( qualifier ) ) {
+function winnow( elements, qualifier, not ) {	//第一个参数表示element元素集，第二个参数传入过滤函数、DOM、选择符、数组，第三个参数为预设结果，为grep函数服务
+	if ( jQuery.isFunction( qualifier ) ) {		//过滤函数
 		return jQuery.grep( elements, function( elem, i ) {
-			return !!qualifier.call( elem, i, elem ) !== not;
+			return !!qualifier.call( elem, i, elem ) !== not;	//!!确保返回值是 Boolean 类型而已,~~同理
 		} );
 	}
 
 	// Single element
-	if ( qualifier.nodeType ) {
+	if ( qualifier.nodeType ) {					//DOM元素
 		return jQuery.grep( elements, function( elem ) {
 			return ( elem === qualifier ) !== not;
 		} );
@@ -2890,22 +2890,22 @@ function winnow( elements, qualifier, not ) {
 	}
 
 	// Simple selector that can be filtered directly, removing non-Elements
-	if ( risSimple.test( qualifier ) ) {
+	if ( risSimple.test( qualifier ) ) {					//简单选择符
 		return jQuery.filter( qualifier, elements, not );
 	}
 
 	// Complex selector, compare the two sets, removing non-Elements
-	qualifier = jQuery.filter( qualifier, elements );
+	qualifier = jQuery.filter( qualifier, elements );//复杂选择符
 	return jQuery.grep( elements, function( elem ) {
 		return ( indexOf.call( qualifier, elem ) > -1 ) !== not && elem.nodeType === 1;
 	} );
 }
 
-jQuery.filter = function( expr, elems, not ) {
+jQuery.filter = function( expr, elems, not ) {	//filter()过滤DOM元素包装集，操作当前元素集，删除不匹配的元素，得到一个新的集合 
 	var elem = elems[ 0 ];
 
 	if ( not ) {
-		expr = ":not(" + expr + ")";
+		expr = ":not(" + expr + ")";		//not选择符，基于sizzle
 	}
 
 	if ( elems.length === 1 && elem.nodeType === 1 ) {
@@ -2917,8 +2917,8 @@ jQuery.filter = function( expr, elems, not ) {
 	} ) );
 };
 
-jQuery.fn.extend( {
-	find: function( selector ) {
+jQuery.fn.extend( {   //jQuery.prototype=jQuery.fn=jQuery.fn.init.prototype，把基于sizzle的几个函数添加到链上
+	find: function( selector ) {//filter()是对选中的元素集合操作，得到这些元素中符合条件的元素，而find()是得到选中元素中符合条件的后代子元素。 
 		var i, ret,
 			len = this.length,
 			self = this;
@@ -2963,6 +2963,7 @@ jQuery.fn.extend( {
 
 
 // Initialize a jQuery object
+//初始化jQuery对象
 
 
 // A central reference to the root jQuery(document)
