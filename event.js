@@ -17,7 +17,7 @@ var
 	rmouseEvent = /^(?:mouse|pointer|contextmenu|drag|drop)|click/,
 	rtypenamespace = /^([^.]*)(?:\.(.+)|)/;
 
-function returnTrue() {
+function returnTrue() {					//传说中的函数式编程   见http://stackoverflow.com/questions/14745912/returntrue-and-returnfalse-functions-in-jquery-source
 	return true;
 }
 
@@ -27,56 +27,77 @@ function returnFalse() {
 
 // Support: IE <=9 only
 // See #13393 for more info
-function safeActiveElement() {
+//解决IE9 bug
+function safeActiveElement() {	
 	try {
 		return document.activeElement;
 	} catch ( err ) { }
 }
 
+//bind()和delegate()都是由on()实现的
 function on( elem, types, selector, data, fn, one ) {
 	var origFn, type;
 
 	// Types can be a map of types/handlers
+	// 如果types是对象，则说明是传入了多个事件
 	if ( typeof types === "object" ) {
 
 		// ( types-Object, selector, data )
+		// 如果selector不是string，则说明用户没有传入selector
 		if ( typeof selector !== "string" ) {
 
 			// ( types-Object, data )
+			// 把selector赋值给data
 			data = data || selector;
+
+			// selector置为undefined
 			selector = undefined;
 		}
+		// 一次执行 types 中的一个,并递归调用自身
 		for ( type in types ) {
 			on( elem, type, selector, data, types[ type ], one );
 		}
 		return elem;
 	}
 
+	// 如果data和fn都为null，说明用户只传了前两个参数（elem以后会用 call/apply 传入）
 	if ( data == null && fn == null ) {
 
 		// ( types, fn )
+		// 顺序调整
 		fn = selector;
 		data = selector = undefined;
-	} else if ( fn == null ) {
+
+	// 如果fn为null，说明用户传了三个参数
+} else if ( fn == null ) {
+
+		// 如果selector的类型是string，说明用户没传data
 		if ( typeof selector === "string" ) {
 
 			// ( types, selector, fn )
+			// 顺序调整
 			fn = data;
 			data = undefined;
 		} else {
 
 			// ( types, data, fn )
+			// 否则的话，说明用户没传selector，而是传了data，将data赋值给fn
 			fn = data;
 			data = selector;
 			selector = undefined;
 		}
 	}
 	if ( fn === false ) {
+		// returnFalse 是一个返回 false 的函数
+		// 如果用户传入的事件处理函数是false值，则将事件处理函数赋值为jQuery内部的returnFalse函数
 		fn = returnFalse;
+
+	// 如果用户没传回调函数，返回this，this将会是调用on方法的jQuery对象
 	} else if ( !fn ) {
 		return elem;
 	}
 
+	// one参数为1说明是函数只执行一次即被废除，即绑定后只作用一次
 	if ( one === 1 ) {
 		origFn = fn;
 		fn = function( event ) {
@@ -87,8 +108,11 @@ function on( elem, types, selector, data, fn, one ) {
 		};
 
 		// Use same guid so caller can remove using origFn
+		// 设置相同的guid，以便将来解除绑定
 		fn.guid = origFn.guid || ( origFn.guid = jQuery.guid++ );
 	}
+
+	// 对于所有情况，调用jQuery.event对象的add方法处理事件
 	return elem.each( function() {
 		jQuery.event.add( this, types, fn, data, selector );
 	} );
