@@ -1,3 +1,9 @@
+/*
+ * @Author: jader 
+ * @Date: 2017-04-10 21:08:30 
+ * @Last Modified by: jader
+ * @Last Modified time: 2017-05-13 20:20:04
+ */
 /* global Symbol */
 // Defining this global in .eslintrc.json would create a danger of using the global
 // unguarded in another place, it seems safer to define global only for this module
@@ -513,7 +519,7 @@ define([
     //class2type[[object RegExp]] = "regexp"  
     //class2type[[object Object]] = "object"  
     //class2type[[object Error]] = "error"  
-    //才是是用来为Object.prototype.toString.call()判断类型服务
+    //来为Object.prototype.toString.call()判断类型服务
     function isArrayLike(obj) {
 
         // Support: real iOS 8.2 only (not reproducible in simulator)
